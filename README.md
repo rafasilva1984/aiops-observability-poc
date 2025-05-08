@@ -1,61 +1,118 @@
 # AIOps Observability PoC
 
-This project demonstrates a Proof of Concept (PoC) for building an AIOps-driven Observability architecture using open source tools.
+Esta PoC (Prova de Conceito) demonstra como implementar uma arquitetura de Observabilidade com Inteligência Artificial (AIOps) utilizando ferramentas open source.
 
-## Components
+## Objetivo
 
-- **OpenTelemetry Collector:** For collecting logs, metrics and traces.
-- **Logstash:** For ingesting and enriching the data.
-- **Elasticsearch:** For storing observability data.
-- **Python + ML (Isolation Forest):** For detecting anomalies.
-- **Grafana:** For visualizing data.
-- **Automation script:** To handle alerts and trigger actions.
+Integrar logs, métricas e traces com machine learning para:
+- Detectar anomalias
+- Visualizar dados em tempo real
+- Automatizar respostas com scripts
 
-## Requirements
+---
 
-- Docker & Docker Compose
+## 🔧 Requisitos
+
+Certifique-se de ter instalado:
+
+- [Docker e Docker Compose](https://docs.docker.com/get-docker/)
 - Python 3.10+
-- Java (for Logstash)
-- Grafana & Elasticsearch running (can use Docker)
+- Java 11+ (para Logstash)
+- Elasticsearch e Grafana (podem rodar via Docker)
 
-## Setup
+---
 
-### 1. Configure OpenTelemetry Collector
+## 🚀 Subindo o Ambiente
 
-Edit `collector/otel-collector-config.yaml` with your endpoints.
+1. **Clone o repositório**
+```bash
+git clone https://github.com/seuusuario/aiops-observability-poc.git
+cd aiops-observability-poc
+```
 
+2. **Suba Elasticsearch e Grafana via Docker**
+Crie um arquivo `docker-compose.yml` com:
+
+```yaml
+version: '3.7'
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - 9200:9200
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+```
+
+```bash
+docker-compose up -d
+```
+
+3. **Execute o OpenTelemetry Collector**
 ```bash
 cd collector
 otelcol-contrib --config otel-collector-config.yaml
 ```
 
-### 2. Setup Logstash
-
-Configure `logstash-pipeline.conf` and start Logstash:
-
+4. **Execute o Logstash**
 ```bash
-cd ingestion
+cd ../ingestion
 logstash -f logstash-pipeline.conf
 ```
 
-### 3. Train and Run the ML Model
+---
 
-Install Python dependencies and run anomaly detection:
+## 🧠 Aplicando a PoC
 
+1. **Treine e rode o modelo de detecção de anomalias**
 ```bash
-cd ml-model
-pip install -r requirements.txt
+cd ../ml-model
+pip install scikit-learn joblib pandas
 python anomaly_detection.py
 ```
 
-### 4. Import Grafana Dashboard
+2. **Importe o dashboard no Grafana**
+- Acesse: http://localhost:3000 (login padrão: admin/admin)
+- Vá até **Dashboards > Import** e cole o conteúdo de `dashboards/grafana-dashboard.json`
 
-Use the `grafana-dashboard.json` file inside Grafana UI to visualize metrics and anomalies.
+3. **Execute a automação**
+```bash
+cd ../automation
+chmod +x alert-handler.sh
+./alert-handler.sh "Anomaly detected on CPU"
+```
 
-### 5. Automation
+---
 
-Use `automation/alert-handler.sh` to act on alerts, such as sending notifications or restarting services.
+## 📂 Estrutura do Projeto
 
-## License
+```
+aiops-observability-poc/
+├── collector/                  # Config do OpenTelemetry Collector
+├── ingestion/                  # Pipeline do Logstash
+├── ml-model/                   # Modelo ML com Isolation Forest
+├── dashboards/                 # Dashboard para Grafana
+├── automation/                 # Scripts de automação para alertas
+└── README.md                   # Este arquivo
+```
+
+---
+
+## 📌 Notas Finais
+
+Essa PoC é modular e facilmente adaptável. Pode ser expandida com:
+- Alertas automáticos do Elasticsearch
+- Conexão com sistemas de incidentes (ex: ServiceNow)
+- Modelos de ML mais avançados com timeseries
+
+Contribuições são bem-vindas!
+
+## 📝 Licença
 
 MIT
