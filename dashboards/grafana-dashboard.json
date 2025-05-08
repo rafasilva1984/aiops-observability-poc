@@ -1,0 +1,12 @@
+
+{
+  "dashboard": {
+    "id": null,
+    "title": "AIOps Observability",
+    "panels": [{
+      "type": "graph",
+      "title": "CPU Usage",
+      "targets": [{"expr": "avg(cpu_usage)"}]
+    }]
+  }
+}
